@@ -81,8 +81,19 @@ class BubbleParticle:
 class DesktopPetWidget(QWidget):
     """Main Desktop Pet Window."""
 
-    MODE_CHIBI = "chibi"
-    MODE_PHOTO = "photo"
+    STYLE_GIRL_CHIBI = "girl_chibi"
+    STYLE_BOY_HAWAIIAN = "boy_hawaiian"
+    STYLE_GIRL_CARD = "girl_card"
+    STYLE_BOY_HAWAIIAN_CARD = "boy_hawaiian_card"
+    STYLE_BOY_SUNSHINE_CARD = "boy_sunshine_card"
+
+    ALL_STYLES = [
+        STYLE_GIRL_CHIBI,
+        STYLE_BOY_HAWAIIAN,
+        STYLE_GIRL_CARD,
+        STYLE_BOY_HAWAIIAN_CARD,
+        STYLE_BOY_SUNSHINE_CARD,
+    ]
 
     STATE_IDLE = "idle"
     STATE_CHEER = "cheer"
@@ -97,7 +108,7 @@ class DesktopPetWidget(QWidget):
         self.setAttribute(Qt.WA_ShowWithoutActivating, False)
 
         # Pet states & appearance
-        self.current_mode = self.MODE_CHIBI
+        self.current_style = self.STYLE_GIRL_CHIBI
         self.current_state = self.STATE_IDLE
         self.target_width = 220
         self.enable_bubbles = True
@@ -155,20 +166,20 @@ class DesktopPetWidget(QWidget):
             make_window_persistent_macos(self.dialog)
 
     def load_assets(self):
-        """Load pixmaps for chibi and photo modes."""
-        idle_path = os.path.join(self.assets_dir, "pet_idle.png")
-        cheer_path = os.path.join(self.assets_dir, "pet_cheer.png")
-        photo_path = os.path.join(self.assets_dir, "pet_photo_card.png")
-        bubble_path = os.path.join(self.assets_dir, "bubble.png")
-
-        if os.path.exists(idle_path):
-            self.pixmaps["chibi_idle"] = QPixmap(idle_path)
-        if os.path.exists(cheer_path):
-            self.pixmaps["chibi_cheer"] = QPixmap(cheer_path)
-        if os.path.exists(photo_path):
-            self.pixmaps["photo_card"] = QPixmap(photo_path)
-        if os.path.exists(bubble_path):
-            self.pixmaps["bubble"] = QPixmap(bubble_path)
+        """Load pixmaps for all chibi characters and photo cards."""
+        assets_map = {
+            "girl_idle": "pet_idle.png",
+            "girl_cheer": "pet_cheer.png",
+            "boy_hawaiian": "pet_boy_hawaiian.png",
+            "girl_card": "pet_photo_card.png",
+            "boy_hawaiian_card": "pet_boy_hawaiian_card.png",
+            "boy_sunshine_card": "pet_boy_sunshine_card.png",
+            "bubble": "bubble.png",
+        }
+        for key, fname in assets_map.items():
+            fpath = os.path.join(self.assets_dir, fname)
+            if os.path.exists(fpath):
+                self.pixmaps[key] = QPixmap(fpath)
 
     def init_bubbles(self):
         """Create floating bubble particles."""
@@ -216,7 +227,7 @@ class DesktopPetWidget(QWidget):
             self.dialog.move(bubble_x, bubble_y)
 
     def trigger_cheer(self, quote=None):
-        """Trigger cheerful toast reaction."""
+        """Trigger cheerful reaction."""
         self.current_state = self.STATE_CHEER
         self.bounce_offset = -18.0  # Little jump
         self.update()
@@ -224,7 +235,8 @@ class DesktopPetWidget(QWidget):
         self.state_timer.stop()
         self.state_timer.start(3000)
 
-        self.dialog.show_message(text=quote, category="cheer")
+        cat = "cheer_boy" if "boy" in self.current_style else "cheer"
+        self.dialog.show_message(text=quote, category=cat)
 
     def _return_to_idle(self):
         self.current_state = self.STATE_IDLE
@@ -246,7 +258,8 @@ class DesktopPetWidget(QWidget):
 
     def _on_ambient_speech(self):
         if self.current_state == self.STATE_IDLE:
-            self.dialog.show_message(category="cheer", duration_ms=4000)
+            cat = "cheer_boy" if "boy" in self.current_style else "cheer"
+            self.dialog.show_message(category=cat, duration_ms=4000)
 
     def _on_anim_frame(self):
         """30 FPS animation loop."""
@@ -291,15 +304,21 @@ class DesktopPetWidget(QWidget):
 
         painter.setOpacity(1.0)
 
-        # 2. Select Sprite Pixmap
+        # 2. Select Sprite Pixmap based on current style
         active_pix = None
-        if self.current_mode == self.MODE_PHOTO:
-            active_pix = self.pixmaps.get("photo_card")
-        else:
+        if self.current_style == self.STYLE_GIRL_CHIBI:
             if self.current_state == self.STATE_CHEER:
-                active_pix = self.pixmaps.get("chibi_cheer") or self.pixmaps.get("chibi_idle")
+                active_pix = self.pixmaps.get("girl_cheer") or self.pixmaps.get("girl_idle")
             else:
-                active_pix = self.pixmaps.get("chibi_idle")
+                active_pix = self.pixmaps.get("girl_idle")
+        elif self.current_style == self.STYLE_BOY_HAWAIIAN:
+            active_pix = self.pixmaps.get("boy_hawaiian")
+        elif self.current_style == self.STYLE_GIRL_CARD:
+            active_pix = self.pixmaps.get("girl_card")
+        elif self.current_style == self.STYLE_BOY_HAWAIIAN_CARD:
+            active_pix = self.pixmaps.get("boy_hawaiian_card")
+        elif self.current_style == self.STYLE_BOY_SUNSHINE_CARD:
+            active_pix = self.pixmaps.get("boy_sunshine_card")
 
         if active_pix:
             # Calculate floating hover offset
@@ -376,16 +395,16 @@ class DesktopPetWidget(QWidget):
         menu = QMenu(self)
         menu.setStyleSheet("""
             QMenu {
-                background-color: rgba(255, 255, 255, 0.95);
-                border: 1px solid rgba(255, 180, 200, 0.6);
-                border-radius: 10px;
+                background-color: rgba(255, 255, 255, 0.96);
+                border: 1px solid rgba(255, 180, 200, 0.7);
+                border-radius: 12px;
                 padding: 6px;
-                font-family: 'PingFang SC', sans-serif;
+                font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
                 font-size: 13px;
                 color: #333333;
             }
             QMenu::item {
-                padding: 6px 20px;
+                padding: 7px 22px;
                 border-radius: 6px;
             }
             QMenu::item:selected {
@@ -400,12 +419,19 @@ class DesktopPetWidget(QWidget):
         """)
 
         action_poke = menu.addAction("💖 戳一戳互动")
-        action_cheer = menu.addAction("🥂 举杯干杯 (Cheers!)")
+        action_cheer = menu.addAction("🥂 举杯/比耶欢呼！")
         menu.addSeparator()
 
-        # Appearance Switch
-        mode_text = "🎨 切换为【唯美照片立绘】" if self.current_mode == self.MODE_CHIBI else "🎨 切换为【Q版萌系精灵】"
-        action_switch_mode = menu.addAction(mode_text)
+        # Multi-Character & Style Submenu
+        style_menu = menu.addMenu("🎭 角色与造型切换")
+        act_g_chibi = style_menu.addAction("🌸 泡泡元气少女 (Q版萌系)")
+        act_b_chibi = style_menu.addAction("🌺 潮酷花衬衫少年 (Q版萌系)")
+        style_menu.addSeparator()
+        act_g_card = style_menu.addAction("✨ 泡泡仙女 (写真卡片)")
+        act_b_card1 = style_menu.addAction("🛍️ 潮酷少年 (写真卡片)")
+        act_b_card2 = style_menu.addAction("📷 阳光摄影师 (写真卡片)")
+
+        action_next_style = menu.addAction("🔄 快速切换下一造型")
 
         # Bubble particles toggle
         bubble_text = "🫧 关闭飘浮泡泡" if self.enable_bubbles else "🫧 开启飘浮泡泡"
@@ -438,8 +464,18 @@ class DesktopPetWidget(QWidget):
 
         if selected == action_poke or selected == action_cheer:
             self.trigger_cheer()
-        elif selected == action_switch_mode:
-            self.toggle_mode()
+        elif selected == act_g_chibi:
+            self.set_style(self.STYLE_GIRL_CHIBI)
+        elif selected == act_b_chibi:
+            self.set_style(self.STYLE_BOY_HAWAIIAN)
+        elif selected == act_g_card:
+            self.set_style(self.STYLE_GIRL_CARD)
+        elif selected == act_b_card1:
+            self.set_style(self.STYLE_BOY_HAWAIIAN_CARD)
+        elif selected == act_b_card2:
+            self.set_style(self.STYLE_BOY_SUNSHINE_CARD)
+        elif selected == action_next_style:
+            self.next_style()
         elif selected == action_toggle_bubbles:
             self.enable_bubbles = not self.enable_bubbles
         elif selected == action_size_s:
@@ -461,12 +497,18 @@ class DesktopPetWidget(QWidget):
         elif selected == action_quit:
             self.close_pet()
 
-    def toggle_mode(self):
-        if self.current_mode == self.MODE_CHIBI:
-            self.current_mode = self.MODE_PHOTO
-        else:
-            self.current_mode = self.MODE_CHIBI
-        self.update()
+    def set_style(self, style_name):
+        """Set active character style."""
+        if style_name in self.ALL_STYLES:
+            self.current_style = style_name
+            self.update()
+            self.trigger_cheer()
+
+    def next_style(self):
+        """Cycle to the next character style."""
+        idx = self.ALL_STYLES.index(self.current_style)
+        next_idx = (idx + 1) % len(self.ALL_STYLES)
+        self.set_style(self.ALL_STYLES[next_idx])
 
     def set_character_width(self, width):
         self.target_width = width
