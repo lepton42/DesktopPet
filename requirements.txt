@@ -1,0 +1,4 @@
+# Desktop Pet Dependencies
+PyQt5>=5.15.0
+Pillow>=9.0.0
+pyobjc-framework-Cocoa>=9.0; sys_platform == "darwin"
