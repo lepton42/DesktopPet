@@ -1,11 +1,11 @@
 # 🌟 元气桌面精灵 (Desktop Pet Companion) 🥂🫧
 
 <p align="center">
-  <img src="assets/pet_boy_sunshine.png" width="170" alt="Sunshine Photographer" />
+  <img src="assets/pet_boy_zootopia.png" width="160" alt="Zootopia Fox Boy" />
   &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="assets/pet_cheer.png" width="160" alt="Bubble Girl" />
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="assets/pet_boy_hawaiian.png" width="160" alt="Hawaiian Boy" />
+  <img src="assets/pet_boy_camera_toast.png" width="160" alt="Camera Toast Boy" />
 </p>
 
 <p align="center">
@@ -24,12 +24,10 @@
 ## ✨ 项目亮点与功能 (Features)
 
 - 🎭 **多角色与丰富造型随心切换 (Multi-Characters & Outfits)**：
-  - **📷 阳光摄影少年 (全新精绘)**：治愈系开朗笑容、经典复古单反、热情挥手问候，充满少年元气！
-  - **🌺 潮酷花衬衫少年 (全新精绘)**：新海诚/京阿尼画风、帅气黑框眼镜、热带粉衬衫与花领带、单手插兜自信微笑。
-  - **🌸 泡泡元气少女 (Q版萌系)**：轻盈仙女裙、甜美举杯干杯（Cheers! 🥂）、眨眼微笑动作。
-  - **✨ 泡泡仙女 (写真卡片)**：唯美浪漫的夜景浮动卡片。
-  - **🛍️ 潮酷少年 (写真卡片)**：潮酷商场街拍写真卡片。
-  - **☀️ 拱桥写真 (写真卡片)**：阳光下倚靠白石桥的治愈系摄影师写真卡片。
+  - **🦊 疯狂动物城·尼克狐狐少年 (方案1·超萌2头身)**：同款超萌二次元Q版贴纸风！粉色热带夏威夷花衬衫、绿色花领带、黑框眼镜、胸口口袋探出一只萌萌的小狐狸玩偶，手捧冰爽波霸奶茶开心眨眼比耶✌️，身旁漂浮七彩气泡与星光！
+  - **📷 阳光摄影·干杯少年 (方案2·超萌2头身)**：同画风Q版2头身！背着经典复古微单相机、戴黑框眼镜开怀大笑、单手高高举杯甜饮隔空与你/少女对饮干杯（Cheers! 🥂），充满治愈活力与羁绊感！
+  - **🌸 泡泡元气少女 (Q版萌系)**：轻盈仙女裙、甜美举杯干杯、眨眼微笑动作、七彩梦幻肥皂泡泡。
+  - **✨ 更多角色与写真卡片**：支持阳光摄影立绘、潮酷花衬衫立绘及多款写真相框随心切换！
   - **支持随时右键自由挑选，或一键「🔄 快速切换下一造型」**！
 - 🫧 **动态上升泡泡粒子系统**：
   - 身旁不断升腾起梦幻肥皂泡泡，鼠标点击即可将泡泡戳破，极具沉浸解压感。
