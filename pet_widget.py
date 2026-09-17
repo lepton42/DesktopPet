@@ -192,21 +192,44 @@ class DesktopPetWidget(QWidget):
         for _ in range(count):
             self.bubbles.append(BubbleParticle(w, h))
 
-    def update_geometry_size(self):
-        """Recalculate window dimensions based on target character width."""
-        char_w = self.target_width
-        char_h = int(char_w * 1.4)
+    def get_active_pixmap(self):
+        """Retrieve current active pixmap based on style and animation state."""
+        if self.current_style == self.STYLE_BOY_SUNSHINE:
+            return self.pixmaps.get("boy_sunshine")
+        elif self.current_style == self.STYLE_BOY_HAWAIIAN:
+            return self.pixmaps.get("boy_hawaiian")
+        elif self.current_style == self.STYLE_GIRL_CHIBI:
+            if self.current_state == self.STATE_CHEER:
+                return self.pixmaps.get("girl_cheer") or self.pixmaps.get("girl_idle")
+            return self.pixmaps.get("girl_idle")
+        elif self.current_style == self.STYLE_GIRL_CARD:
+            return self.pixmaps.get("girl_card")
+        elif self.current_style == self.STYLE_BOY_HAWAIIAN_CARD:
+            return self.pixmaps.get("boy_hawaiian_card")
+        elif self.current_style == self.STYLE_BOY_SUNSHINE_CARD:
+            return self.pixmaps.get("boy_sunshine_card")
+        return None
 
-        # Give extra side and vertical margin for floating bubbles
-        margin_x = 70
-        margin_y = 60
+    def update_geometry_size(self):
+        """Recalculate window dimensions preserving true natural character aspect ratio."""
+        pix = self.get_active_pixmap()
+        char_w = self.target_width
+        if pix and not pix.isNull() and pix.width() > 0:
+            aspect = pix.height() / pix.width()
+        else:
+            aspect = 1.4
+
+        char_h = int(char_w * aspect)
+
+        # Margins for bubbles and soft shadow
+        margin_x = 60
+        margin_y = 50
 
         total_w = char_w + margin_x * 2
         total_h = char_h + margin_y * 2
         self.char_rect = QRectF(margin_x, margin_y, char_w, char_h)
         self.resize(total_w, total_h)
 
-        # Update bubble boundary constraints
         for b in self.bubbles:
             b.bounds_w = total_w
             b.bounds_h = total_h
@@ -307,45 +330,36 @@ class DesktopPetWidget(QWidget):
 
         painter.setOpacity(1.0)
 
-        # 2. Select Sprite Pixmap based on current style
-        active_pix = None
-        if self.current_style == self.STYLE_BOY_SUNSHINE:
-            active_pix = self.pixmaps.get("boy_sunshine")
-        elif self.current_style == self.STYLE_BOY_HAWAIIAN:
-            active_pix = self.pixmaps.get("boy_hawaiian")
-        elif self.current_style == self.STYLE_GIRL_CHIBI:
-            if self.current_state == self.STATE_CHEER:
-                active_pix = self.pixmaps.get("girl_cheer") or self.pixmaps.get("girl_idle")
-            else:
-                active_pix = self.pixmaps.get("girl_idle")
-        elif self.current_style == self.STYLE_GIRL_CARD:
-            active_pix = self.pixmaps.get("girl_card")
-        elif self.current_style == self.STYLE_BOY_HAWAIIAN_CARD:
-            active_pix = self.pixmaps.get("boy_hawaiian_card")
-        elif self.current_style == self.STYLE_BOY_SUNSHINE_CARD:
-            active_pix = self.pixmaps.get("boy_sunshine_card")
+        # 2. Select Sprite Pixmap & Render with Strict Natural Aspect Ratio
+        active_pix = self.get_active_pixmap()
+        if active_pix and not active_pix.isNull():
+            pw = active_pix.width()
+            ph = active_pix.height()
+            aspect = ph / pw if pw > 0 else 1.0
 
-        if active_pix:
-            # Calculate floating hover offset
+            # Scale within char_rect keeping true aspect ratio (no stretch / squash)
+            scaled_w = self.char_rect.width()
+            scaled_h = scaled_w * aspect
+            if scaled_h > self.char_rect.height():
+                scaled_h = self.char_rect.height()
+                scaled_w = scaled_h / aspect
+
             hover_y = math.sin(self.float_phase) * 5.0 + self.bounce_offset
-            draw_rect = QRectF(
-                self.char_rect.x(),
-                self.char_rect.y() + hover_y,
-                self.char_rect.width(),
-                self.char_rect.height()
-            )
+            draw_x = self.char_rect.x() + (self.char_rect.width() - scaled_w) / 2.0
+            draw_y = self.char_rect.y() + (self.char_rect.height() - scaled_h) + hover_y
 
-            # Draw subtle ground shadow beneath the floating pet
-            shadow_w = self.char_rect.width() * 0.6
-            shadow_h = 14
-            shadow_x = self.char_rect.x() + (self.char_rect.width() - shadow_w) / 2
-            shadow_y = self.char_rect.y() + self.char_rect.height() - 6
+            # Draw subtle ground shadow beneath the character feet
+            shadow_w = scaled_w * 0.6
+            shadow_h = 13
+            shadow_x = draw_x + (scaled_w - shadow_w) / 2.0
+            shadow_y = self.char_rect.y() + self.char_rect.height() - 4
             painter.setPen(Qt.NoPen)
             painter.setBrush(QBrush(QColor(0, 0, 0, 32)))
             painter.drawEllipse(QRectF(shadow_x, shadow_y, shadow_w, shadow_h))
 
-            # Draw pet sprite
-            painter.drawPixmap(draw_rect.toRect(), active_pix)
+            # Draw pet sprite with perfect natural proportions
+            target_rect = QRectF(draw_x, draw_y, scaled_w, scaled_h)
+            painter.drawPixmap(target_rect.toRect(), active_pix)
 
     # Mouse & Drag Interactions
     def mousePressEvent(self, event):
@@ -506,9 +520,10 @@ class DesktopPetWidget(QWidget):
             self.close_pet()
 
     def set_style(self, style_name):
-        """Set active character style."""
+        """Set active character style and adapt window geometry to natural aspect ratio."""
         if style_name in self.ALL_STYLES:
             self.current_style = style_name
+            self.update_geometry_size()
             self.update()
             self.trigger_cheer()
 
