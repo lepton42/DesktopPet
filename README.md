@@ -1,9 +1,11 @@
 # 🌟 元气桌面精灵 (Desktop Pet Companion) 🥂🫧
 
 <p align="center">
-  <img src="assets/pet_cheer.png" width="180" alt="Girl Mascot" />
+  <img src="assets/pet_boy_sunshine.png" width="170" alt="Sunshine Photographer" />
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="assets/pet_boy_hawaiian.png" width="180" alt="Boy Mascot" />
+  <img src="assets/pet_cheer.png" width="160" alt="Bubble Girl" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/pet_boy_hawaiian.png" width="160" alt="Hawaiian Boy" />
 </p>
 
 <p align="center">
@@ -22,11 +24,12 @@
 ## ✨ 项目亮点与功能 (Features)
 
 - 🎭 **多角色与丰富造型随心切换 (Multi-Characters & Outfits)**：
-  - **🌸 泡泡元气少女 (Q版萌系)**：轻盈仙女裙、甜美干杯举杯（Cheers! 🥂）、眨眼微笑动作。
-  - **🌺 潮酷花衬衫少年 (Q版萌系)**：帅气黑框眼镜、热带粉色花衬衫与花领带、元气比耶（Peace! ✌️）。
+  - **📷 阳光摄影少年 (全新精绘)**：治愈系开朗笑容、经典复古单反、热情挥手问候，充满少年元气！
+  - **🌺 潮酷花衬衫少年 (全新精绘)**：新海诚/京阿尼画风、帅气黑框眼镜、热带粉衬衫与花领带、单手插兜自信微笑。
+  - **🌸 泡泡元气少女 (Q版萌系)**：轻盈仙女裙、甜美举杯干杯（Cheers! 🥂）、眨眼微笑动作。
   - **✨ 泡泡仙女 (写真卡片)**：唯美浪漫的夜景浮动卡片。
   - **🛍️ 潮酷少年 (写真卡片)**：潮酷商场街拍写真卡片。
-  - **📷 阳光摄影师 (写真卡片)**：阳光下倚靠白石桥的治愈系摄影师写真卡片。
+  - **☀️ 拱桥写真 (写真卡片)**：阳光下倚靠白石桥的治愈系摄影师写真卡片。
   - **支持随时右键自由挑选，或一键「🔄 快速切换下一造型」**！
 - 🫧 **动态上升泡泡粒子系统**：
   - 身旁不断升腾起梦幻肥皂泡泡，鼠标点击即可将泡泡戳破，极具沉浸解压感。
