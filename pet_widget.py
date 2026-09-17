@@ -81,16 +81,16 @@ class BubbleParticle:
 class DesktopPetWidget(QWidget):
     """Main Desktop Pet Window."""
 
-    STYLE_BOY_SUNSHINE = "boy_sunshine"
-    STYLE_BOY_HAWAIIAN = "boy_hawaiian"
+    STYLE_BOY_ZOOTOPIA = "boy_zootopia"
+    STYLE_BOY_CAMERA_TOAST = "boy_camera_toast"
     STYLE_GIRL_CHIBI = "girl_chibi"
     STYLE_GIRL_CARD = "girl_card"
     STYLE_BOY_HAWAIIAN_CARD = "boy_hawaiian_card"
     STYLE_BOY_SUNSHINE_CARD = "boy_sunshine_card"
 
     ALL_STYLES = [
-        STYLE_BOY_SUNSHINE,
-        STYLE_BOY_HAWAIIAN,
+        STYLE_BOY_ZOOTOPIA,
+        STYLE_BOY_CAMERA_TOAST,
         STYLE_GIRL_CHIBI,
         STYLE_GIRL_CARD,
         STYLE_BOY_HAWAIIAN_CARD,
@@ -109,8 +109,8 @@ class DesktopPetWidget(QWidget):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating, False)
 
-        # Pet states & appearance (default to the newly regenerated sunshine boy!)
-        self.current_style = self.STYLE_BOY_SUNSHINE
+        # Pet states & appearance
+        self.current_style = self.STYLE_BOY_ZOOTOPIA
         self.current_state = self.STATE_IDLE
         self.target_width = 220
         self.enable_bubbles = True
@@ -170,6 +170,8 @@ class DesktopPetWidget(QWidget):
     def load_assets(self):
         """Load pixmaps for all chibi characters and photo cards."""
         assets_map = {
+            "boy_zootopia": "pet_boy_zootopia.png",
+            "boy_camera_toast": "pet_boy_camera_toast.png",
             "boy_sunshine": "pet_boy_sunshine.png",
             "boy_hawaiian": "pet_boy_hawaiian.png",
             "girl_idle": "pet_idle.png",
@@ -184,6 +186,12 @@ class DesktopPetWidget(QWidget):
             if os.path.exists(fpath):
                 self.pixmaps[key] = QPixmap(fpath)
 
+        # Seamless fallbacks until new artwork finishes generating
+        if "boy_zootopia" not in self.pixmaps and "boy_hawaiian" in self.pixmaps:
+            self.pixmaps["boy_zootopia"] = self.pixmaps["boy_hawaiian"]
+        if "boy_camera_toast" not in self.pixmaps and "boy_sunshine" in self.pixmaps:
+            self.pixmaps["boy_camera_toast"] = self.pixmaps["boy_sunshine"]
+
     def init_bubbles(self):
         """Create floating bubble particles."""
         self.bubbles.clear()
@@ -194,10 +202,10 @@ class DesktopPetWidget(QWidget):
 
     def get_active_pixmap(self):
         """Retrieve current active pixmap based on style and animation state."""
-        if self.current_style == self.STYLE_BOY_SUNSHINE:
-            return self.pixmaps.get("boy_sunshine")
-        elif self.current_style == self.STYLE_BOY_HAWAIIAN:
-            return self.pixmaps.get("boy_hawaiian")
+        if self.current_style == self.STYLE_BOY_ZOOTOPIA:
+            return self.pixmaps.get("boy_zootopia") or self.pixmaps.get("boy_hawaiian")
+        elif self.current_style == self.STYLE_BOY_CAMERA_TOAST:
+            return self.pixmaps.get("boy_camera_toast") or self.pixmaps.get("boy_sunshine")
         elif self.current_style == self.STYLE_GIRL_CHIBI:
             if self.current_state == self.STATE_CHEER:
                 return self.pixmaps.get("girl_cheer") or self.pixmaps.get("girl_idle")
@@ -261,7 +269,15 @@ class DesktopPetWidget(QWidget):
         self.state_timer.stop()
         self.state_timer.start(3000)
 
-        cat = "cheer_boy" if "boy" in self.current_style else "cheer"
+        if self.current_style == self.STYLE_BOY_ZOOTOPIA:
+            cat = "cheer_zootopia"
+        elif self.current_style == self.STYLE_BOY_CAMERA_TOAST:
+            cat = "cheer_camera_toast"
+        elif "boy" in self.current_style:
+            cat = "cheer_boy"
+        else:
+            cat = "cheer"
+
         self.dialog.show_message(text=quote, category=cat)
 
     def _return_to_idle(self):
@@ -284,7 +300,14 @@ class DesktopPetWidget(QWidget):
 
     def _on_ambient_speech(self):
         if self.current_state == self.STATE_IDLE:
-            cat = "cheer_boy" if "boy" in self.current_style else "cheer"
+            if self.current_style == self.STYLE_BOY_ZOOTOPIA:
+                cat = "cheer_zootopia"
+            elif self.current_style == self.STYLE_BOY_CAMERA_TOAST:
+                cat = "cheer_camera_toast"
+            elif "boy" in self.current_style:
+                cat = "cheer_boy"
+            else:
+                cat = "cheer"
             self.dialog.show_message(category=cat, duration_ms=4000)
 
     def _on_anim_frame(self):
@@ -443,8 +466,8 @@ class DesktopPetWidget(QWidget):
 
         # Multi-Character & Style Submenu
         style_menu = menu.addMenu("🎭 角色与造型切换")
-        act_b_sunshine = style_menu.addAction("📷 阳光摄影少年 (全新精绘)")
-        act_b_hawaiian = style_menu.addAction("🌺 潮酷花衬衫少年 (全新精绘)")
+        act_b_zootopia = style_menu.addAction("🦊【方案1】疯狂动物城·狐尼克联名潮男")
+        act_b_camera = style_menu.addAction("📸【方案2】胶片对拍·神仙眷侣互动少年")
         act_g_chibi = style_menu.addAction("🌸 泡泡元气少女 (Q版萌系)")
         style_menu.addSeparator()
         act_g_card = style_menu.addAction("✨ 泡泡仙女 (写真卡片)")
@@ -484,10 +507,10 @@ class DesktopPetWidget(QWidget):
 
         if selected == action_poke or selected == action_cheer:
             self.trigger_cheer()
-        elif selected == act_b_sunshine:
-            self.set_style(self.STYLE_BOY_SUNSHINE)
-        elif selected == act_b_hawaiian:
-            self.set_style(self.STYLE_BOY_HAWAIIAN)
+        elif selected == act_b_zootopia:
+            self.set_style(self.STYLE_BOY_ZOOTOPIA)
+        elif selected == act_b_camera:
+            self.set_style(self.STYLE_BOY_CAMERA_TOAST)
         elif selected == act_g_chibi:
             self.set_style(self.STYLE_GIRL_CHIBI)
         elif selected == act_g_card:
